@@ -208,7 +208,6 @@ pub fn distributed_scenario_test() {
 
   // Replica 1 writes again after sync
   let r1_after = lww.set(synced1, "r1_write2", "a")
-  echo r1_after
 
   // This should override the previous merge
   lww.value(r1_after)

@@ -53,7 +53,7 @@ pub fn add(kernel: DotKernel(a), delta: DotKernel(a), value: a, id: ReplicaId) {
     DotKernel(ctx: ctx, entries: kernel.entries |> dict.insert(dot, value))
   let delta =
     DotKernel(
-      ctx: delta.ctx |> ctx_add(dot),
+      ctx: delta.ctx |> ctx_add(dot) |> ctx_compact,
       entries: delta.entries |> dict.insert(dot, value),
     )
   #(kernel, delta)
@@ -122,7 +122,7 @@ fn ctx_next(ctx: DotContext, id: ReplicaId) -> #(Dot, DotContext) {
         _ -> 1
       }
     })
-  let v = ctx.clock |> dict.get(id) |> result.unwrap(1)
+  let v = ctx.clock |> dict.get(id) |> result.unwrap(0)
   #(#(id, v), DotContext(clock:, cloud: ctx.cloud))
 }
 

@@ -16,12 +16,9 @@ pub fn value(awor: Awor(a)) {
 }
 
 pub fn add(awor: Awor(a), value: a, id: replica.ReplicaId) {
-  echo value
   let delta = option.unwrap(awor.delta, dot.new())
   let #(kernel, delta) = awor.kernel |> dot.remove(delta, value)
   let #(kernel, delta) = kernel |> dot.add(delta, value, id)
-  echo kernel
-  echo delta
   Awor(kernel: kernel, delta: Some(delta))
 }
 
