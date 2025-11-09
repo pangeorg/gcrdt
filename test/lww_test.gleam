@@ -9,7 +9,7 @@ pub fn new_creates_empty_register_test() {
 
 pub fn set_updates_value_test() {
   let reg = lww.new()
-  let reg1 = lww.set(reg, "hello", 1)
+  let reg1 = lww.set(reg, "hello", "a")
 
   lww.value(reg1)
   |> should.equal(Ok("hello"))
@@ -17,9 +17,9 @@ pub fn set_updates_value_test() {
 
 pub fn set_multiple_times_same_replica_test() {
   let reg = lww.new()
-  let reg1 = reg |> lww.set("first", 1)
-  let reg2 = reg1 |> lww.set("second", 1)
-  let reg3 = reg2 |> lww.set("third", 1)
+  let reg1 = reg |> lww.set("first", "a")
+  let reg2 = reg1 |> lww.set("second", "a")
+  let reg3 = reg2 |> lww.set("third", "a")
 
   lww.value(reg3)
   |> should.equal(Ok("third"))
@@ -27,8 +27,8 @@ pub fn set_multiple_times_same_replica_test() {
 
 pub fn set_different_replicas_test() {
   let reg = lww.new()
-  let reg1 = lww.set(reg, "replica1", 1)
-  let reg2 = lww.set(reg, "replica2", 2)
+  let reg1 = lww.set(reg, "replica1", "a")
+  let reg2 = lww.set(reg, "replica2", "b")
 
   lww.value(reg1)
   |> should.equal(Ok("replica1"))
@@ -47,9 +47,9 @@ pub fn value_returns_error_for_empty_test() {
 pub fn value_returns_latest_write_test() {
   let reg =
     lww.new()
-    |> lww.set("v1", 1)
-    |> lww.set("v2", 1)
-    |> lww.set("v3", 1)
+    |> lww.set("v1", "a")
+    |> lww.set("v2", "a")
+    |> lww.set("v3", "a")
 
   lww.value(reg)
   |> should.equal(Ok("v3"))
@@ -58,8 +58,8 @@ pub fn value_returns_latest_write_test() {
 pub fn value_with_int_type_test() {
   let reg =
     lww.new()
-    |> lww.set(42, 1)
-    |> lww.set(100, 1)
+    |> lww.set(42, "a")
+    |> lww.set(100, "a")
 
   lww.value(reg)
   |> should.equal(Ok(100))
@@ -68,7 +68,7 @@ pub fn value_with_int_type_test() {
 pub fn value_with_list_type_test() {
   let reg =
     lww.new()
-    |> lww.set([1, 2, 3], 1)
+    |> lww.set([1, 2, 3], "a")
 
   lww.value(reg)
   |> should.equal(Ok([1, 2, 3]))
@@ -86,7 +86,7 @@ pub fn merge_empty_registers_test() {
 
 pub fn merge_empty_with_non_empty_test() {
   let reg1 = lww.new()
-  let reg2 = lww.new() |> lww.set("value", 1)
+  let reg2 = lww.new() |> lww.set("value", "a")
 
   let merged = lww.merge(reg1, reg2)
   lww.value(merged)
@@ -94,8 +94,8 @@ pub fn merge_empty_with_non_empty_test() {
 }
 
 pub fn merge_sequential_writes_test() {
-  let reg1 = lww.new() |> lww.set("first", 1)
-  let reg2 = reg1 |> lww.set("second", 1)
+  let reg1 = lww.new() |> lww.set("first", "a")
+  let reg2 = reg1 |> lww.set("second", "a")
 
   let merged = lww.merge(reg1, reg2)
   lww.value(merged)
@@ -103,8 +103,8 @@ pub fn merge_sequential_writes_test() {
 }
 
 pub fn merge_favors_greater_timestamp_test() {
-  let reg1 = lww.new() |> lww.set("old", 1)
-  let reg2 = reg1 |> lww.set("new", 1)
+  let reg1 = lww.new() |> lww.set("old", "a")
+  let reg2 = reg1 |> lww.set("new", "a")
 
   // reg2 has greater timestamp
   let merged = lww.merge(reg1, reg2)
@@ -120,8 +120,8 @@ pub fn merge_favors_greater_timestamp_test() {
 // Merge tests - concurrent updates
 pub fn merge_concurrent_writes_test() {
   let base = lww.new()
-  let reg1 = lww.set(base, "replica1", 1)
-  let reg2 = lww.set(reg1, "replica2", 2)
+  let reg1 = lww.set(base, "replica1", "a")
+  let reg2 = lww.set(reg1, "replica2", "b")
 
   // These are concurrent, merge should pick one consistently
   let merged1 = lww.merge(reg1, reg2)
@@ -134,9 +134,9 @@ pub fn merge_concurrent_writes_test() {
 
 pub fn merge_concurrent_picks_higher_id_test() {
   let base = lww.new()
-  let reg1 = lww.set(base, "replica1", 1)
-  let reg2 = lww.set(base, "replica2", 2)
-  let reg3 = lww.set(base, "replica3", 3)
+  let reg1 = lww.set(base, "replica1", "a")
+  let reg2 = lww.set(base, "replica2", "b")
+  let reg3 = lww.set(base, "replica3", "c")
 
   let merged12 = lww.merge(reg1, reg2)
   lww.value(merged12)
@@ -155,8 +155,8 @@ pub fn merge_complex_concurrent_test() {
   let base = lww.new()
 
   // Multiple writes on different replicas
-  let reg1 = base |> lww.set("r1v1", 1) |> lww.set("r1v2", 1)
-  let reg2 = base |> lww.set("r2v1", 2) |> lww.set("r2v2", 2)
+  let reg1 = base |> lww.set("r1v1", "a") |> lww.set("r1v2", "a")
+  let reg2 = base |> lww.set("r2v1", "b") |> lww.set("r2v2", "b")
 
   let merged = lww.merge(reg1, reg2)
 
@@ -167,7 +167,7 @@ pub fn merge_complex_concurrent_test() {
 
 // Merge properties tests
 pub fn merge_is_idempotent_test() {
-  let reg = lww.new() |> lww.set("value", 1)
+  let reg = lww.new() |> lww.set("value", "a")
   let merged = lww.merge(reg, reg)
 
   lww.value(merged)
@@ -175,8 +175,8 @@ pub fn merge_is_idempotent_test() {
 }
 
 pub fn merge_with_self_after_update_test() {
-  let reg1 = lww.new() |> lww.set("first", 1)
-  let reg2 = reg1 |> lww.set("second", 1)
+  let reg1 = lww.new() |> lww.set("first", "a")
+  let reg2 = reg1 |> lww.set("second", "a")
 
   let merged = lww.merge(reg1, reg2)
   lww.value(merged)
@@ -193,10 +193,10 @@ pub fn distributed_scenario_test() {
   let initial = lww.new()
 
   // Replica 1 writes
-  let r1 = initial |> lww.set("r1_write1", 1)
+  let r1 = initial |> lww.set("r1_write1", "a")
 
   // Replica 2 writes concurrently
-  let r2 = r1 |> lww.set("r2_write1", 2)
+  let r2 = r1 |> lww.set("r2_write1", "b")
 
   // Replicas sync
   let synced1 = lww.merge(r1, r2)
@@ -207,7 +207,8 @@ pub fn distributed_scenario_test() {
   |> should.equal(lww.value(synced2))
 
   // Replica 1 writes again after sync
-  let r1_after = lww.set(synced1, "r1_write2", 1)
+  let r1_after = lww.set(synced1, "r1_write2", "a")
+  echo r1_after
 
   // This should override the previous merge
   lww.value(r1_after)
@@ -217,9 +218,9 @@ pub fn distributed_scenario_test() {
 pub fn three_way_merge_test() {
   let base = lww.new()
 
-  let r1 = base |> lww.set("replica1", 1)
-  let r2 = r1 |> lww.set("replica2", 2)
-  let r3 = r2 |> lww.set("replica3", 3)
+  let r1 = base |> lww.set("replica1", "a")
+  let r2 = r1 |> lww.set("replica2", "b")
+  let r3 = r2 |> lww.set("replica3", "c")
 
   // Merge in different orders
   let m1 = lww.merge(lww.merge(r1, r2), r3)
@@ -239,13 +240,13 @@ pub fn causally_ordered_updates_test() {
   let r0 = lww.new()
 
   // Replica 1 makes first write
-  let r1_v1 = r0 |> lww.set("v1", 1)
+  let r1_v1 = r0 |> lww.set("v1", "a")
 
   // Replica 2 receives r1_v1 and updates
-  let r2_v2 = r1_v1 |> lww.set("v2", 2)
+  let r2_v2 = r1_v1 |> lww.set("v2", "b")
 
   // Replica 3 receives r2_v2 and updates
-  let r3_v3 = r2_v2 |> lww.set("v3", 3)
+  let r3_v3 = r2_v2 |> lww.set("v3", "c")
 
   // Latest write should win
   lww.value(r3_v3)
@@ -261,14 +262,14 @@ pub fn concurrent_then_sequential_test() {
   let base = lww.new()
 
   // Concurrent writes
-  let r1 = base |> lww.set("concurrent1", 1)
-  let r2 = r1 |> lww.set("concurrent2", 2)
+  let r1 = base |> lww.set("concurrent1", "a")
+  let r2 = r1 |> lww.set("concurrent2", "b")
 
   // Merge concurrent writes
   let merged = lww.merge(r1, r2)
 
   // Sequential write after merge
-  let r3 = merged |> lww.set("sequential", 3)
+  let r3 = merged |> lww.set("sequential", "c")
 
   // Sequential write should win
   lww.value(r3)
@@ -284,10 +285,10 @@ pub fn multi_replica_convergence_test() {
   // Simulate 4 replicas all writing concurrently
   let base = lww.new()
 
-  let r1 = base |> lww.set("replica1", 1)
-  let r2 = base |> lww.set("replica2", 2)
-  let r3 = base |> lww.set("replica3", 3)
-  let r4 = base |> lww.set("replica4", 4)
+  let r1 = base |> lww.set("replica1", "a")
+  let r2 = base |> lww.set("replica2", "b")
+  let r3 = base |> lww.set("replica3", "c")
+  let r4 = base |> lww.set("replica4", "d")
 
   // Merge in a tree pattern
   let m12 = lww.merge(r1, r2)
@@ -308,8 +309,8 @@ pub fn type_safety_test() {
 
   let user_reg =
     lww.new()
-    |> lww.set(User("Alice", 30), 1)
-    |> lww.set(User("Bob", 25), 1)
+    |> lww.set(User("Alice", 30), "a")
+    |> lww.set(User("Bob", 25), "a")
 
   lww.value(user_reg)
   |> should.equal(Ok(User("Bob", 25)))

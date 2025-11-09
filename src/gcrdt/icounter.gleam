@@ -1,3 +1,4 @@
+import gcrdt/replica
 import gleam/dict
 import gleam/int
 import gleam/option
@@ -5,7 +6,7 @@ import gleam/option
 /// Continously increasing counter
 /// Maps Replica to count
 pub type ICounter =
-  dict.Dict(Int, Int)
+  dict.Dict(replica.ReplicaId, Int)
 
 pub fn new() -> ICounter {
   dict.new()
@@ -15,7 +16,7 @@ pub fn value(counter: ICounter) -> Int {
   counter |> dict.fold(0, fn(acc, _k, v) { acc + v })
 }
 
-pub fn inc(counter: ICounter, id: Int) {
+pub fn inc(counter: ICounter, id: replica.ReplicaId) {
   let increment = fn(x) {
     case x {
       option.Some(i) -> i + 1

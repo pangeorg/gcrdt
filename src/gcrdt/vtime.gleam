@@ -1,4 +1,5 @@
 import gcrdt/icounter
+import gcrdt/replica
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -23,7 +24,7 @@ pub fn new() -> VTime {
   icounter.new()
 }
 
-pub fn inc(a: VTime, id: Int) -> VTime {
+pub fn inc(a: VTime, id: replica.ReplicaId) -> VTime {
   icounter.inc(a, id)
 }
 
@@ -32,7 +33,7 @@ pub fn merge(a: VTime, b: VTime) -> VTime {
 }
 
 pub fn compare(a: VTime, b: VTime) -> VOrd {
-  let val_or_default = fn(map: VTime, key: Int) {
+  let val_or_default = fn(map: VTime, key: replica.ReplicaId) {
     case dict.get(map, key) {
       Ok(v) -> v
       _ -> 0

@@ -11,8 +11,8 @@ pub fn new_creates_empty_vtime_test() {
 
 pub fn inc_increments_counter_test() {
   let v = vtime.new()
-  let v1 = vtime.inc(v, 1)
-  let v2 = vtime.inc(v1, 1)
+  let v1 = vtime.inc(v, "a")
+  let v2 = vtime.inc(v1, "a")
 
   vtime.compare(v, v1)
   |> should.equal(vtime.Lt)
@@ -23,8 +23,8 @@ pub fn inc_increments_counter_test() {
 
 pub fn inc_multiple_replicas_test() {
   let v = vtime.new()
-  let v1 = vtime.inc(v, 1)
-  let v2 = vtime.inc(v, 2)
+  let v1 = vtime.inc(v, "a")
+  let v2 = vtime.inc(v, "b")
 
   vtime.compare(v1, v2)
   |> should.equal(vtime.Cc)
@@ -41,7 +41,7 @@ pub fn compare_equal_vtimes_test() {
 
 pub fn compare_greater_than_test() {
   let v1 = vtime.new()
-  let v2 = vtime.inc(v1, 1)
+  let v2 = vtime.inc(v1, "a")
 
   vtime.compare(v2, v1)
   |> should.equal(vtime.Gt)
@@ -49,7 +49,7 @@ pub fn compare_greater_than_test() {
 
 pub fn compare_less_than_test() {
   let v1 = vtime.new()
-  let v2 = vtime.inc(v1, 1)
+  let v2 = vtime.inc(v1, "a")
 
   vtime.compare(v1, v2)
   |> should.equal(vtime.Lt)
@@ -57,8 +57,8 @@ pub fn compare_less_than_test() {
 
 pub fn compare_concurrent_test() {
   let v = vtime.new()
-  let v1 = vtime.inc(v, 1)
-  let v2 = vtime.inc(v, 2)
+  let v1 = vtime.inc(v, "a")
+  let v2 = vtime.inc(v, "b")
 
   vtime.compare(v1, v2)
   |> should.equal(vtime.Cc)
@@ -69,8 +69,8 @@ pub fn compare_concurrent_test() {
 
 pub fn compare_concurrent_complex_test() {
   let v = vtime.new()
-  let v1 = v |> vtime.inc(1) |> vtime.inc(1)
-  let v2 = v |> vtime.inc(2) |> vtime.inc(2) |> vtime.inc(2)
+  let v1 = v |> vtime.inc("a") |> vtime.inc("a")
+  let v2 = v |> vtime.inc("b") |> vtime.inc("b") |> vtime.inc("b")
 
   vtime.compare(v1, v2)
   |> should.equal(vtime.Cc)
@@ -78,8 +78,8 @@ pub fn compare_concurrent_complex_test() {
 
 pub fn compare_partial_order_test() {
   let v = vtime.new()
-  let v1 = v |> vtime.inc(1) |> vtime.inc(2)
-  let v2 = v |> vtime.inc(1)
+  let v1 = v |> vtime.inc("a") |> vtime.inc("b")
+  let v2 = v |> vtime.inc("a")
 
   vtime.compare(v1, v2)
   |> should.equal(vtime.Gt)
@@ -99,7 +99,7 @@ pub fn merge_empty_vtimes_test() {
 }
 
 pub fn merge_with_empty_test() {
-  let v1 = vtime.new() |> vtime.inc(1)
+  let v1 = vtime.new() |> vtime.inc("a")
   let v2 = vtime.new()
   let merged = vtime.merge(v1, v2)
 
@@ -108,8 +108,8 @@ pub fn merge_with_empty_test() {
 }
 
 pub fn merge_disjoint_vtimes_test() {
-  let v1 = vtime.new() |> vtime.inc(1)
-  let v2 = vtime.new() |> vtime.inc(2)
+  let v1 = vtime.new() |> vtime.inc("a")
+  let v2 = vtime.new() |> vtime.inc("b")
   let merged = vtime.merge(v1, v2)
 
   vtime.compare(merged, v1)
@@ -121,8 +121,8 @@ pub fn merge_disjoint_vtimes_test() {
 
 pub fn merge_overlapping_vtimes_test() {
   let v = vtime.new()
-  let v1 = v |> vtime.inc(1) |> vtime.inc(1)
-  let v2 = v |> vtime.inc(1) |> vtime.inc(2)
+  let v1 = v |> vtime.inc("a") |> vtime.inc("a")
+  let v2 = v |> vtime.inc("a") |> vtime.inc("b")
   let merged = vtime.merge(v1, v2)
 
   vtime.compare(merged, v1)
@@ -133,8 +133,8 @@ pub fn merge_overlapping_vtimes_test() {
 }
 
 pub fn merge_is_commutative_test() {
-  let v1 = vtime.new() |> vtime.inc(1) |> vtime.inc(1)
-  let v2 = vtime.new() |> vtime.inc(2)
+  let v1 = vtime.new() |> vtime.inc("a") |> vtime.inc("a")
+  let v2 = vtime.new() |> vtime.inc("b")
 
   let m1 = vtime.merge(v1, v2)
   let m2 = vtime.merge(v2, v1)
@@ -144,9 +144,9 @@ pub fn merge_is_commutative_test() {
 }
 
 pub fn merge_is_associative_test() {
-  let v1 = vtime.new() |> vtime.inc(1)
-  let v2 = vtime.new() |> vtime.inc(2)
-  let v3 = vtime.new() |> vtime.inc(3)
+  let v1 = vtime.new() |> vtime.inc("a")
+  let v2 = vtime.new() |> vtime.inc("b")
+  let v3 = vtime.new() |> vtime.inc("c")
 
   let m1 = vtime.merge(vtime.merge(v1, v2), v3)
   let m2 = vtime.merge(v1, vtime.merge(v2, v3))
@@ -156,7 +156,7 @@ pub fn merge_is_associative_test() {
 }
 
 pub fn merge_is_idempotent_test() {
-  let v1 = vtime.new() |> vtime.inc(1) |> vtime.inc(2)
+  let v1 = vtime.new() |> vtime.inc("a") |> vtime.inc("b")
   let merged = vtime.merge(v1, v1)
 
   vtime.compare(merged, v1)
@@ -171,32 +171,32 @@ pub fn max_empty_vtime_test() {
 }
 
 pub fn max_single_replica_test() {
-  let v = vtime.new() |> vtime.inc(5)
+  let v = vtime.new() |> vtime.inc("b")
   vtime.max(v)
-  |> should.equal(option.Some(5))
+  |> should.equal(option.Some("b"))
 }
 
 pub fn max_multiple_replicas_test() {
   let v =
     vtime.new()
-    |> vtime.inc(1)
-    |> vtime.inc(3)
-    |> vtime.inc(2)
+    |> vtime.inc("a")
+    |> vtime.inc("a")
+    |> vtime.inc("b")
 
   vtime.max(v)
-  |> should.equal(option.Some(3))
+  |> should.equal(option.Some("a"))
 }
 
 pub fn max_returns_largest_id_test() {
   let v =
     vtime.new()
-    |> vtime.inc(10)
-    |> vtime.inc(100)
-    |> vtime.inc(100)
-    |> vtime.inc(5)
+    |> vtime.inc("a")
+    |> vtime.inc("b")
+    |> vtime.inc("c")
+    |> vtime.inc("c")
 
   vtime.max(v)
-  |> should.equal(option.Some(100))
+  |> should.equal(option.Some("c"))
 }
 
 // Integration tests
@@ -205,17 +205,17 @@ pub fn causality_tracking_test() {
   let v0 = vtime.new()
 
   // Replica 1 makes changes
-  let v1 = v0 |> vtime.inc(1) |> vtime.inc(1)
+  let v1 = v0 |> vtime.inc("a") |> vtime.inc("a")
 
   // Replica 2 makes changes independently
-  let v2 = v0 |> vtime.inc(2)
+  let v2 = v0 |> vtime.inc("b")
 
   // These should be concurrent
   vtime.compare(v1, v2)
   |> should.equal(vtime.Cc)
 
   // Replica 3 receives v1 and makes changes
-  let v3 = v1 |> vtime.inc(3)
+  let v3 = v1 |> vtime.inc("c")
 
   // v3 should be greater than v1
   vtime.compare(v3, v1)
@@ -240,9 +240,9 @@ pub fn causality_tracking_test() {
 }
 
 pub fn transitivity_test() {
-  let v1 = vtime.new() |> vtime.inc(1)
-  let v2 = v1 |> vtime.inc(1)
-  let v3 = v2 |> vtime.inc(1)
+  let v1 = vtime.new() |> vtime.inc("a")
+  let v2 = v1 |> vtime.inc("a")
+  let v3 = v2 |> vtime.inc("a")
 
   // If v1 < v2 and v2 < v3, then v1 < v3
   vtime.compare(v1, v2)

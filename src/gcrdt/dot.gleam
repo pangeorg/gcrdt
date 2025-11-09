@@ -47,7 +47,7 @@ pub fn merge(a: DotKernel(a), b: DotKernel(a)) {
   DotKernel(ctx:, entries:)
 }
 
-pub fn add(kernel: DotKernel(a), delta: DotKernel(a), value: a, id: Int) {
+pub fn add(kernel: DotKernel(a), delta: DotKernel(a), value: a, id: ReplicaId) {
   let #(dot, ctx) = ctx_next(kernel.ctx, id)
   let kernel =
     DotKernel(ctx: ctx, entries: kernel.entries |> dict.insert(dot, value))
@@ -113,7 +113,7 @@ fn ctx_add(ctx: DotContext, dot: Dot) {
 /// Create a new `Dot` for the given context and id
 /// Returns the newly generated dot (representing the most recent event for this replica)
 /// and the updated DotContext
-fn ctx_next(ctx: DotContext, id: Int) -> #(Dot, DotContext) {
+fn ctx_next(ctx: DotContext, id: ReplicaId) -> #(Dot, DotContext) {
   let clock =
     ctx.clock
     |> dict.upsert(id, fn(i) {

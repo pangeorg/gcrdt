@@ -1,3 +1,4 @@
+import gcrdt/replica
 import gcrdt/vtime
 import gleam/dict
 
@@ -26,7 +27,7 @@ pub fn value(awor: AworSimple(a)) {
   })
 }
 
-pub fn add(awor: AworSimple(a), item: a, id: Int) {
+pub fn add(awor: AworSimple(a), item: a, id: replica.ReplicaId) {
   let #(add, rem) = {
     case dict.get(awor.add, item), dict.get(awor.rem, item) {
       Ok(avtime), _ -> #(
@@ -46,7 +47,7 @@ pub fn add(awor: AworSimple(a), item: a, id: Int) {
   Awor(add, rem)
 }
 
-pub fn remove(awor: AworSimple(a), item: a, id: Int) {
+pub fn remove(awor: AworSimple(a), item: a, id: replica.ReplicaId) {
   let #(add, rem) = {
     case dict.get(awor.add, item), dict.get(awor.rem, item) {
       Ok(avtime), _ -> #(

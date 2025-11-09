@@ -1,4 +1,5 @@
 import gcrdt/icounter
+import gcrdt/replica
 
 /// increasing/decreasing counter
 pub opaque type IDCounter {
@@ -13,12 +14,12 @@ pub fn value(counter: IDCounter) -> Int {
   icounter.value(counter.i) - icounter.value(counter.d)
 }
 
-pub fn inc(counter: IDCounter, id: Int) {
+pub fn inc(counter: IDCounter, id: replica.ReplicaId) {
   let i = icounter.inc(counter.i, id)
   IDCounter(i: i, d: counter.d)
 }
 
-pub fn dec(counter: IDCounter, id: Int) {
+pub fn dec(counter: IDCounter, id: replica.ReplicaId) {
   let d = icounter.inc(counter.d, id)
   IDCounter(i: counter.i, d: d)
 }

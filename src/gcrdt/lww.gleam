@@ -1,10 +1,11 @@
+import gcrdt/replica
 import gcrdt/vtime
 import gleam/dict
 import gleam/option.{None, Some}
 
 // last write wins register
 pub opaque type Lww(a) {
-  Lww(value: dict.Dict(Int, a), stamp: vtime.VTime)
+  Lww(value: dict.Dict(replica.ReplicaId, a), stamp: vtime.VTime)
 }
 
 pub fn new() {
@@ -20,7 +21,7 @@ pub fn value(lww: Lww(a)) {
   }
 }
 
-pub fn set(lww: Lww(a), value: a, id: Int) {
+pub fn set(lww: Lww(a), value: a, id: replica.ReplicaId) {
   let value = lww.value |> dict.insert(id, value)
   Lww(value:, stamp: vtime.inc(lww.stamp, id))
 }
